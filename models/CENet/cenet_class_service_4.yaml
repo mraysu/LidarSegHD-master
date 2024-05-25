@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cenet-seg-0-75
+  labels:
+    k8s-app: cenet-seg-0-75
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: cenet-seg-0-75
+  template:
+    metadata:
+      labels:
+        k8s-app: cenet-seg-0-75
+    spec:
+      containers:
+        - name: cenet-seg-pod-0-75
+          image: Dockerfile_ms
+          command: ["sleep", "infinity"]
+          volumeMounts:
+            - mountPath: /root/dataset
+              name: ivannia-volume
+            - mountPath: /dev/shm
+              name: cache-volume
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+              memory: "32G"
+              cpu: "1"
+              ephemeral-storage: "32G"
+            requests:
+              memory: "32G"
+              cpu: "1"
+              ephemeral-storage: "32G"
+      volumes:
+        - name: ivannia-volume
+          persistentVolumeClaim:
+            claimName: ivannia-volume
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 6G
+          name: cache-volume
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+                    operator: In
+                    values:
+                      - NVIDIA-A10

@@ -39,7 +39,8 @@ train_data_loader = Map(
         "return_ref": Bool(),
         "batch_size": Int(),
         "shuffle": Bool(),
-    }
+        "num_workers": Int(),
+        }
 )
 
 val_data_loader = Map(
@@ -49,6 +50,7 @@ val_data_loader = Map(
         "return_ref": Bool(),
         "batch_size": Int(),
         "shuffle": Bool(),
+        "num_workers": Int(),
     }
 )
 

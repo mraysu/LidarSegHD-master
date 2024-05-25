@@ -189,6 +189,7 @@ class cylinder_dataset(data.Dataset):
 
     def __getitem__(self, index):
         'Generates one sample of data'
+        #try-catch, make sure each velodyne has corresponding label
         data = self.point_cloud_dataset[index]
         if len(data) == 2:
             xyz, labels = data

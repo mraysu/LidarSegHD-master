@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cenet-seg-0-25
+  labels:
+    k8s-app: cenet-seg-0-25
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: cenet-seg-0-25
+  template:
+    metadata:
+      labels:
+        k8s-app: cenet-seg-0-25
+    spec:
+      containers:
+        - name: cenet-seg-pod-0-25
+          image: ghcr.io/darthiv02/cenet_image:1.1
+          command: ["sleep", "infinity"]
+          volumeMounts:
+            - mountPath: /root/dataset
+              name: tls-data-ivannia
+            - mountPath: /root/dataset-5
+              name: tls-data-ivannia-5
+            - mountPath: /root/dataset-kitti-2
+              name: semantic-2-data-ivannia
+            - mountPath: /dev/shm
+              name: cache-volume
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+              memory: "32G"
+              cpu: "1"
+            requests:
+              memory: "32G"
+              cpu: "1"
+      volumes:
+        - name: tls-data-ivannia
+          persistentVolumeClaim:
+            claimName: tls-data-ivannia
+        - name: tls-data-ivannia-5
+          persistentVolumeClaim:
+            claimName: tls-data-ivannia-5
+        - name: semantic-2-data-ivannia
+          persistentVolumeClaim:
+            claimName: semantic-2-data-ivannia
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 4G
+          name: cache-volume
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+                    operator: In
+                    values:
+                      - NVIDIA-A10

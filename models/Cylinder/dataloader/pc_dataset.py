@@ -28,7 +28,7 @@ def get_pc_model_class(name):
 @register_dataset
 class SemKITTI_demo(data.Dataset):
     def __init__(self, data_path, imageset='demo',
-                 return_ref=True, label_mapping="tls.yaml", demo_label_path=None):
+                 return_ref=True, label_mapping="semantic-kitti.yaml", demo_label_path=None):
         with open(label_mapping, 'r') as stream:
             semkittiyaml = yaml.safe_load(stream)
         self.learning_map = semkittiyaml['learning_map']
@@ -63,7 +63,7 @@ class SemKITTI_demo(data.Dataset):
 @register_dataset
 class SemKITTI_sk(data.Dataset):
     def __init__(self, data_path, imageset='train',
-                 return_ref=False, label_mapping="tls.yaml", nusc=None):
+                 return_ref=False, label_mapping="semantic-kitti.yaml", nusc=None):
         self.return_ref = return_ref
         with open(label_mapping, 'r') as stream:
             semkittiyaml = yaml.safe_load(stream)
@@ -75,7 +75,6 @@ class SemKITTI_sk(data.Dataset):
             split = semkittiyaml['split']['valid']
         elif imageset == 'test':
             split = semkittiyaml['split']['test']
-            print(split)
         else:
             raise Exception('Split must be train/val/test')
 
@@ -97,9 +96,13 @@ class SemKITTI_sk(data.Dataset):
             annotated_data = annotated_data & 0xFFFF  # delete high 16 digits binary
             annotated_data = np.vectorize(self.learning_map.__getitem__)(annotated_data)
 
-        data_tuple = (raw_data[:, :3], annotated_data.astype(np.uint8))
+        mask = np.ones(len(raw_data), dtype=bool)
+        mask[:int(len(mask)*(1-0.1))] = False
+        np.random.shuffle(mask)
+            
+        data_tuple = (raw_data[:, :3][mask, ...], annotated_data.astype(np.uint8)[mask, ...])
         if self.return_ref:
-            data_tuple += (raw_data[:, 3],)
+            data_tuple += (raw_data[:, 3][mask, ...],)
         return data_tuple
 
 
