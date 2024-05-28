@@ -1,23 +1,23 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: cenet-seg-0-75
-  labels:
-    k8s-app: cenet-seg-0-75
+  name: cenet-seg-job
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      k8s-app: cenet-seg-0-75
   template:
     metadata:
       labels:
-        k8s-app: cenet-seg-0-75
+        k8s-app: cenet-seg-job
     spec:
+      restartPolicy: Never
       containers:
-        - name: cenet-seg-pod-0-75
-          image: ghcr.io/mraysu/mraysu_app:v3
-          command: ["sleep", "infinity"]
+        - name: cenet-seg-job
+          image: ghcr.io/mraysu/mraysu_app:v4
+          command:
+            [
+              "/bin/bash",
+              "-c",
+              "python -c 'import sys; print(sys.prefix)' && sh train.sh 0.75",
+            ]
           volumeMounts:
             - mountPath: /root/dataset
               name: ivannia-volume

@@ -1,6 +1,8 @@
 # My gitignore
 save
 save_2
+logs
+logs_2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
