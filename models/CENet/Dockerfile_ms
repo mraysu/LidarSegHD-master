@@ -1,0 +1,7 @@
+FROM ghcr.io/darthiv02/cenet_image:1.1
+
+COPY . .
+
+# make RUN commands use the new environment
+SHELL ["conda", "run", "--no-capture-output", "-n", "cenet", "/bin/bash", "-c"]
+RUN echo 'conda activate cenet' >> /root/.bashrc
